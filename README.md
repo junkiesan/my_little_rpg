@@ -39,10 +39,10 @@ You should see a blue screen with the LÖVE logo saying "No Game". This means it
 1. Download or clone this project to your computer.
 
 2. Open Terminal and navigate to the project directory. For example:
-cd path/to/your/folder
+`cd path/to/your/folder`
 
 3. Run the game by typing:
-love .
+`love .`
 (Don't forget the dot – it tells LÖVE to run the current folder.)
 
 Alternatively, you can drag and drop the project folder onto the LÖVE application icon.
