@@ -49,10 +49,6 @@ Alternatively, you can drag and drop the project folder onto the LÖVE applicati
 
 ## Notes
 
-This game uses only the built-in LÖVE2D features – no external libraries needed.
-
-Tested with LÖVE 11.4 and macOS Sonoma.
-
 If you want to export the game, you can zip the contents of the folder and rename the file extension to .love.
 
 
