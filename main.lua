@@ -17,6 +17,14 @@ function love.load()
     npc.height = 20
     npc.color = {0, 0, 1}   -- bleu (couleur RVB)
     npc.message = "Bonjour, aventurier !"  -- le message que le PNJ dira
+    -- Initialisation d'un deuxième PNJ (PNJ2)
+    npc2 = {}
+    npc2.x = 150
+    npc2.y = 400
+    npc2.width = 20
+    npc2.height = 20
+    npc2.color = {0, 1, 0}  -- vert
+    npc2.message = "Salut, je suis l'autre PNJ."
 end
 
 -- love.update(dt) s'exécute à chaque frame pour mettre à jour la logique du jeu.
@@ -56,6 +64,24 @@ function love.update(dt)
   local dy = (player.y + player.height/2) - (npc.y + npc.height/2)
   local distance = math.sqrt(dx*dx + dy*dy)
   player.nearNPC = (distance < 30)  -- booléen, true si le joueur est à >30px du PNJ
+  -- Détection du PNJ le plus proche
+  player.nearNPC = false
+  nearbyNPC = nil
+  local function checkProximity(px, py, tx, ty)
+      local dx = (px - tx)
+      local dy = (py - ty)
+      return (dx*dx + dy*dy) < (30*30)  -- on compare les distances au carré pour éviter sqrt
+  end
+  if checkProximity(player.x + player.width/2, player.y + player.height/2,
+                    npc.x + npc.width/2, npc.y + npc.height/2) then
+    player.nearNPC = true
+    nearbyNPC = npc
+  end
+  if checkProximity(player.x + player.width/2, player.y + player.height/2,
+                    npc2.x + npc2.width/2, npc2.y + npc2.height/2) then
+    player.nearNPC = true
+    nearbyNPC = npc2
+  end
 end
 
 -- love.draw() s'exécute à chaque frame juste après love.update, pour dessiner à l'écran.
@@ -69,20 +95,12 @@ function love.draw()
   -- Dessin du PNJ (carré bleu)
   love.graphics.setColor(npc.color)  -- applique la couleur bleue du PNJ
   love.graphics.rectangle("fill", npc.x, npc.y, npc.width, npc.height)
+  -- Dessin du second PNJ (vert)
+  love.graphics.setColor(npc2.color)
+  love.graphics.rectangle("fill", npc2.x, npc2.y, npc2.width, npc2.height)
   -- Dessin du joueur sous forme d'un rectangle rouge
   love.graphics.setColor(1, 0, 0)  -- définit la couleur courante en rouge (RGB: 1,0,0)
   love.graphics.rectangle("fill", player.x, player.y, player.width, player.height)
-      if dialogueActive and currentDialogue then
-        -- On dessine une boîte semi-transparente en bas de l'écran
-        local w = love.graphics.getWidth()
-        local h = love.graphics.getHeight()
-        love.graphics.setColor(0, 0, 0, 0.7)  -- noir translucide (alpha 0.7)
-        love.graphics.rectangle("fill", 0, h - 60, w, 60)
-        -- Texte du dialogue en blanc
-        love.graphics.setColor(1, 1, 1, 1)
-        love.graphics.printf(currentDialogue, 10, h - 50, w - 20, "left")
-        -- love.graphics.printf permet d'afficher du texte formaté (ici on spécifie une largeur max et un alignement)
-    end
     if dialogueActive and currentDialogue then
         -- On dessine une boîte semi-transparente en bas de l'écran
         local w = love.graphics.getWidth()
@@ -99,13 +117,32 @@ end
 function love.keypressed(key)
     if key == "space" then
         if dialogueActive then
-            -- Si un dialogue est déjà affiché, on le ferme
+            -- Fermer le dialogue
             dialogueActive = false
         else
-            -- Si aucun dialogue affiché, et que le joueur est près du PNJ, on ouvre le dialogue
-            if player.nearNPC then
+            if player.nearNPC and nearbyNPC ~= nil then
                 dialogueActive = true
-                currentDialogue = npc.message
+                -- Gestion de la quête selon le PNJ et l'état
+                if questStage == nil then questStage = 0 end
+                if nearbyNPC == npc then
+                    -- PNJ donneur de quête
+                    if questStage == 0 then
+                        currentDialogue = "J'ai une mission pour toi : va parler au personnage en vert, puis reviens me voir."
+                        questStage = 1  -- quête démarrée
+                    elseif questStage == 1 then
+                        currentDialogue = "Dépêche-toi d'aller le voir."
+                    elseif questStage == 2 then
+                        currentDialogue = "Merci d'avoir fait ce que je t'ai demandé ! (Quête terminée)"
+                    end
+                elseif nearbyNPC == npc2 then
+                    -- Second PNJ (cible de la quête)
+                    if questStage == 1 then
+                        currentDialogue = "Bonjour. Tu pourras dire à l'autre que tout va bien."
+                        questStage = 2  -- on considère la quête accomplie une fois ce PNJ parlé
+                    else
+                        currentDialogue = "Bonjour."
+                    end
+                end
             end
         end
     end
