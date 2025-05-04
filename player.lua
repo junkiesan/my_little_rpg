@@ -11,7 +11,8 @@ function player.load()
     player.hp = 3
     player.maxHp = 3
     player.attackCooldown = 0
-    player.facing = "down" 
+    player.facing = "down"
+    player.attackVisual = {time = 0, x = 0, y = 0, w = 0, h = 0}
 end
 
 function player.update(dt)
@@ -40,11 +41,23 @@ function player.update(dt)
   if player.attackCooldown > 0 then
       player.attackCooldown = player.attackCooldown - dt
   end
+  if player.attackVisual.time > 0 then
+    player.attackVisual.time = player.attackVisual.time - dt
+  end
 end
 
 function player.draw()
     love.graphics.setColor(1, 0, 0)
     love.graphics.rectangle("fill", player.x, player.y, player.width, player.height)
+    if player.attackVisual.time > 0 then
+      love.graphics.setColor(1, 1, 0, 0.4)  -- jaune semi-transparent
+      love.graphics.rectangle("fill",
+          player.attackVisual.x,
+          player.attackVisual.y,
+          player.attackVisual.w,
+          player.attackVisual.h
+      )
+  end
 end
 
 function player.getCenter()
@@ -85,6 +98,13 @@ function player.attack()
   end
 
   enemy.hitAt(ax, ay, aw, ah)
+  player.attackVisual = {
+    time = 0.1,
+    x = ax,
+    y = ay,
+    w = aw,
+    h = ah
+}
 end
 
 

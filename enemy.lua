@@ -29,6 +29,11 @@ function enemy.update(dt, player)
             enemy.invincibleTime = 1  -- 1 seconde d’invincibilité
         end
     end
+    for i = #enemy.list, 1, -1 do
+      if enemy.list[i].hp <= 0 then
+          table.remove(enemy.list, i)
+      end
+  end
 end
 
 function enemy.draw()
