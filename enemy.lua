@@ -10,7 +10,8 @@ function enemy.load()
             height = 20,
             color = {0.7, 0, 0},
             damage = 1,
-            hp = 2
+            hp = 2,
+            flash = 0
         }
     }
     enemy.loot = {}
@@ -28,6 +29,9 @@ function enemy.update(dt, player)
             player.hp = math.max(0, player.hp - e.damage)
             enemy.invincibleTime = 1  -- 1 seconde d’invincibilité
         end
+        if e.flash > 0 then
+          e.flash = e.flash - dt
+        end
     end
     for i = #enemy.list, 1, -1 do
       if enemy.list[i].hp <= 0 then
@@ -44,11 +48,17 @@ function enemy.update(dt, player)
 end
 
 function enemy.draw()
-    for _, e in ipairs(enemy.list) do
-        love.graphics.setColor(e.color)
-        love.graphics.rectangle("fill", e.x, e.y, e.width, e.height)
-        love.graphics.setColor(e.hp > 0 and e.color or {0.2, 0.2, 0.2})
+  for _, e in ipairs(enemy.list) do
+    local color = e.color
+    if e.flash > 0 then
+        color = {1, 1, 1} -- blanc si touché
+    elseif e.hp <= 0 then
+        color = {0.2, 0.2, 0.2} -- gris si mort (optionnel car supprimé ensuite)
     end
+
+    love.graphics.setColor(color)
+    love.graphics.rectangle("fill", e.x, e.y, e.width, e.height)
+  end
 end
 
 function enemy.checkCollision(e, player)
@@ -66,6 +76,7 @@ function enemy.hitAt(x, y, w, h)
          y < e.y + e.height and
          e.y < y + h then
           e.hp = e.hp - 1
+          e.flash = 0.2
           return true
       end
   end
