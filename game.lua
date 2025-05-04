@@ -2,6 +2,7 @@
 local player = require("player")
 local npc = require("npc")
 local dialogue = require("dialogue")
+local enemy = require("enemy")
 
 local game = {}
 
@@ -10,11 +11,13 @@ function game.load()
     player.load()
     npc.load()
     dialogue.load()
+    enemy.load()
 end
 
 function game.update(dt)
     if not dialogue.active then
         player.update(dt)
+        enemy.update(dt, player)
     end
     npc.update(dt, player)
 end
@@ -24,6 +27,7 @@ function game.draw()
     player.draw()
     player.drawHUD()
     dialogue.draw()
+    enemy.draw()
 end
 
 function game.keypressed(key)

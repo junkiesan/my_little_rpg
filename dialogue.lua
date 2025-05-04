@@ -15,6 +15,7 @@ function dialogue.keypressed(key, player, npc)
             dialogue.active = false
             dialogue.currentText = ""
         else
+            player.attack()
             local n = npc.getNearby()
             if n then
                 dialogue.active = true
