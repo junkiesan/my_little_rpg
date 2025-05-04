@@ -13,7 +13,7 @@ function enemy.load()
             hp = 2
         }
     }
-
+    enemy.loot = {}
     enemy.invincibleTime = 0
 end
 
@@ -31,6 +31,13 @@ function enemy.update(dt, player)
     end
     for i = #enemy.list, 1, -1 do
       if enemy.list[i].hp <= 0 then
+          table.insert(enemy.loot, {
+            x = enemy.list[i].x,
+            y = enemy.list[i].y,
+            w = 10,
+            h = 10,
+            collected = false
+        })
           table.remove(enemy.list, i)
       end
   end
@@ -63,6 +70,28 @@ function enemy.hitAt(x, y, w, h)
       end
   end
   return false
+end
+
+function enemy.drawLoot()
+  for _, item in ipairs(enemy.loot) do
+      if not item.collected then
+          love.graphics.setColor(1, 1, 0)  -- jaune
+          love.graphics.rectangle("fill", item.x, item.y, item.w, item.h)
+      end
+  end
+end
+
+function enemy.checkLootPickup(player)
+  for _, item in ipairs(enemy.loot) do
+      if not item.collected and
+         item.x < player.x + player.width and
+         player.x < item.x + item.w and
+         item.y < player.y + player.height and
+         player.y < item.y + item.h then
+          item.collected = true
+          player.hp = math.min(player.maxHp, player.hp + 1)
+      end
+  end
 end
 
 return enemy

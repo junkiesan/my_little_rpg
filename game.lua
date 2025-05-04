@@ -18,6 +18,7 @@ function game.update(dt)
     if not dialogue.active then
         player.update(dt)
         enemy.update(dt, player)
+        enemy.checkLootPickup(player)
     end
     npc.update(dt, player)
 end
@@ -28,6 +29,7 @@ function game.draw()
     player.drawHUD()
     dialogue.draw()
     enemy.draw()
+    enemy.drawLoot()
 end
 
 function game.keypressed(key)
