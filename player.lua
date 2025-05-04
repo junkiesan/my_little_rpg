@@ -7,6 +7,8 @@ function player.load()
     player.width = 20
     player.height = 20
     player.speed = 100
+    player.hp = 3
+    player.maxHp = 3
 end
 
 function player.update(dt)
@@ -32,6 +34,18 @@ end
 
 function player.getCenter()
     return player.x + player.width / 2, player.y + player.height / 2
+end
+
+function player.drawHUD()
+  local x, y = 10, 10
+  for i = 1, player.maxHp do
+      if i <= player.hp then
+          love.graphics.setColor(1, 0, 0)  -- rouge : cœur plein
+      else
+          love.graphics.setColor(0.5, 0.5, 0.5)  -- gris : cœur vide
+      end
+      love.graphics.rectangle("fill", x + (i - 1) * 25, y, 20, 20)
+  end
 end
 
 return player

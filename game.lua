@@ -22,6 +22,7 @@ end
 function game.draw()
     npc.draw()
     player.draw()
+    player.drawHUD()
     dialogue.draw()
 end
 
